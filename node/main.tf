@@ -41,6 +41,9 @@ resource "aws_instance" "this" {
   user_data                   = local.user_data
   user_data_replace_on_change = true
 
+  # TEMPORARY: SSH key for debugging
+  key_name                    = "vcluster-debug-key"
+
   # TEMPORARY: Enable public IP for debugging
   associate_public_ip_address = true
 
