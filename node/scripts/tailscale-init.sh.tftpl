@@ -1,0 +1,27 @@
+#!/bin/bash
+set -euo pipefail
+
+# Log all output to syslog and console
+exec 1> >(logger -s -t tailscale-init) 2>&1
+
+echo "Starting Tailscale installation at $(date)"
+
+# Install Tailscale using official script
+echo "Downloading and installing Tailscale..."
+curl -fsSL https://tailscale.com/install.sh | sh
+
+# Wait for tailscaled to be ready
+echo "Waiting for tailscaled service to be ready..."
+sleep 5
+
+# Configure Tailscale with ephemeral node, SSH, and accept-routes
+echo "Configuring Tailscale..."
+sudo tailscale up \
+  --auth-key="${tailscale_auth_key}?ephemeral=true" \
+  --ssh \
+  --accept-routes \
+  --hostname="${hostname}" \
+  --advertise-tags=tag:vcluster-worker
+
+echo "Tailscale configuration completed successfully at $(date)"
+echo "Node joined tailnet as: ${hostname}"

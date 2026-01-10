@@ -156,6 +156,75 @@ You can configure the **NodeProvider** with the following options:
 | `vcluster.com/csi-enabled`    | `true`        | Enables deployment of the CSI driver with a `<provider>-default-disk` storage class.                 |
 | `vcluster.com/vpc-cidr`       | `10.0.0.0/16` | Sets the VPC CIDR range. Useful in multi-cloud scenarios to avoid CIDR conflicts.           |
 
+### Tailscale Integration
+
+You can optionally enable Tailscale on worker nodes for secure remote access and networking.
+
+**Use Cases:**
+- Direct SSH access to worker nodes via Tailscale (no bastion host needed)
+- Accessing services running on worker nodes
+- Connecting worker nodes to your tailnet infrastructure
+
+**Setup:**
+
+1. Generate an ephemeral auth key from your [Tailscale admin console](https://login.tailscale.com/admin/settings/keys):
+   - Navigate to Settings > Keys > Auth keys
+   - Click "Generate auth key"
+   - Enable "Ephemeral" (nodes auto-removed when terminated)
+   - Optionally add tags like `tag:vcluster-worker` for ACL management
+
+2. Configure your nodeType with Tailscale properties:
+
+```yaml
+privateNodes:
+  enabled: true
+  autoNodes:
+  - provider: aws-ec2
+    dynamic:
+    - name: aws-cpu-nodes
+      nodeTypeSelector:
+      - property: instance-type
+        operator: In
+        values: ["t3.medium"]
+      - property: tailscale-enabled
+        operator: In
+        values: ["true"]
+      - property: tailscale-auth-key
+        operator: Exists
+```
+
+Or add properties directly to the provider:
+
+```yaml
+privateNodes:
+  enabled: true
+  autoNodes:
+  - provider: aws-ec2
+    properties:
+      tailscale-enabled: "true"
+      tailscale-auth-key: "tskey-auth-xxxxx-xxxxxxxxxxxxxx"
+    dynamic:
+    - name: aws-cpu-nodes
+      nodeTypeSelector:
+      - property: instance-type
+        operator: In
+        values: ["t3.medium"]
+```
+
+**Features automatically enabled:**
+- **Ephemeral nodes** - Nodes automatically removed from tailnet when terminated
+- **Tailscale SSH** - SSH access via Tailscale network (configure ACLs in Tailscale admin)
+- **Accept routes** - Nodes can access routes advertised by other tailnet nodes
+
+**Security Best Practices:**
+- Store auth keys in Kubernetes secrets rather than directly in YAML
+- Use ephemeral keys to ensure automatic cleanup
+- Configure Tailscale ACLs to restrict SSH access
+- Use tags (`tag:vcluster-worker`) for granular permission control
+- Rotate auth keys regularly (requires node replacement)
+
+**Note:** Auth keys are passed via EC2 user data. While the keys are ephemeral and limited in scope, consider using AWS Systems Manager Parameter Store for additional security in production environments.
+
 ## Example
 
 ```yaml
