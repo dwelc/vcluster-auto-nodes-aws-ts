@@ -1,6 +1,6 @@
   - |
     #!/bin/bash
-    set -euo pipefail
+    set -eu
 
     # Log to both syslog and file for debugging
     exec 1> >(tee /var/log/tailscale-init.log | logger -s -t tailscale-init) 2>&1
