@@ -14,10 +14,15 @@
       sleep 2
     done
 
-    # Connect to Tailscale
+    # Connect to Tailscale (try with tags first, fallback without tags if needed)
     tailscale up \
       --reset \
       --auth-key="${tailscale_auth_key}" \
       --accept-routes \
       --hostname="${hostname}" \
-      --advertise-tags=tag:vcluster-worker
+      --advertise-tags=tag:vcluster-worker || \
+    tailscale up \
+      --reset \
+      --auth-key="${tailscale_auth_key}" \
+      --accept-routes \
+      --hostname="${hostname}"
