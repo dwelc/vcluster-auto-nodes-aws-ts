@@ -21,13 +21,13 @@ locals {
     }
   ) : ""
 
-  # Combine Tailscale user data with custom user data
-  # If both exist, join with newline; otherwise use whichever exists
-  combined_user_data = join("\n", compact([
-    local.tailscale_user_data,
-    var.vcluster.userData
-  ]))
-
-  # Final user data - set to null if empty to avoid unnecessary updates
-  user_data = local.combined_user_data != "" ? local.combined_user_data : null
+  # Combine Tailscale user data with vCluster join command
+  # Since vCluster generates cloud-config with runcmd, we need to merge properly
+  user_data = local.tailscale_enabled && local.tailscale_auth_key != "" ? (
+    var.vcluster.userData != "" ? replace(
+      var.vcluster.userData,
+      "runcmd:",
+      "runcmd:\n${local.tailscale_user_data}"
+    ) : var.vcluster.userData
+  ) : (var.vcluster.userData != "" ? var.vcluster.userData : null)
 }
