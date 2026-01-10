@@ -34,17 +34,21 @@
     # Configure Tailscale with ephemeral node and accept-routes
     echo "Configuring Tailscale..."
     if ! tailscale up \
-      --auth-key="${tailscale_auth_key}?ephemeral=true" \
+      --reset \
+      --auth-key="${tailscale_auth_key}" \
       --accept-routes \
       --hostname="${hostname}" \
       --advertise-tags=tag:vcluster-worker; then
-      echo "ERROR: Failed to connect to Tailscale"
+      echo "ERROR: Failed to connect to Tailscale with tags"
       echo "Trying without tags..."
-      tailscale up \
-        --auth-key="${tailscale_auth_key}?ephemeral=true" \
+      if ! tailscale up \
+        --reset \
+        --auth-key="${tailscale_auth_key}" \
         --accept-routes \
-        --hostname="${hostname}" || echo "ERROR: Still failed"
-      exit 1
+        --hostname="${hostname}"; then
+        echo "ERROR: Still failed"
+        exit 1
+      fi
     fi
 
     echo "Tailscale configuration completed successfully at $(date)"
