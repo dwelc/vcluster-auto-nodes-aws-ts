@@ -47,15 +47,6 @@ resource "aws_security_group" "workers" {
     cidr_blocks = [local.vpc_cidr_block]
   }
 
-  # TEMPORARY: Allow SSH from internet for debugging
-  ingress {
-    description = "ssh-debug"
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
   # Kubernetes API
   ingress {
     description = "kubernetes-api"

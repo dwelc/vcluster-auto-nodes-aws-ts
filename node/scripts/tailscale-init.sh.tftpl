@@ -1,56 +1,23 @@
   - |
     #!/bin/bash
-    # Tailscale installation and setup
+    set -euo pipefail
 
-    # Log to a dedicated file for easier debugging
-    exec > /var/log/tailscale-init.log 2>&1
-    set -x  # Enable command tracing
+    # Log to syslog
+    exec 1> >(logger -s -t tailscale-init) 2>&1
 
-    echo "=== Tailscale installation starting at $(date) ==="
-    echo "PWD: $(pwd)"
-    echo "USER: $(whoami)"
-    echo "PATH: $PATH"
-
-    # Install Tailscale using official script
-    echo "Downloading and installing Tailscale..."
-    if curl -fsSL https://tailscale.com/install.sh | sh; then
-      echo "Tailscale installed successfully"
-    else
-      echo "ERROR: Failed to install Tailscale (exit code: $?)"
-      exit 1
-    fi
+    # Install Tailscale
+    curl -fsSL https://tailscale.com/install.sh | sh
 
     # Wait for tailscaled to be ready
-    echo "Waiting for tailscaled service to be ready..."
     for i in {1..30}; do
-      if systemctl is-active --quiet tailscaled; then
-        echo "tailscaled is ready"
-        break
-      fi
-      echo "Waiting for tailscaled... attempt $i/30"
+      systemctl is-active --quiet tailscaled && break
       sleep 2
     done
 
-    # Configure Tailscale with ephemeral node and accept-routes
-    echo "Configuring Tailscale..."
-    if ! tailscale up \
+    # Connect to Tailscale
+    tailscale up \
       --reset \
       --auth-key="${tailscale_auth_key}" \
       --accept-routes \
       --hostname="${hostname}" \
-      --advertise-tags=tag:vcluster-worker; then
-      echo "ERROR: Failed to connect to Tailscale with tags"
-      echo "Trying without tags..."
-      if ! tailscale up \
-        --reset \
-        --auth-key="${tailscale_auth_key}" \
-        --accept-routes \
-        --hostname="${hostname}"; then
-        echo "ERROR: Still failed"
-        exit 1
-      fi
-    fi
-
-    echo "Tailscale configuration completed successfully at $(date)"
-    echo "Node joined tailnet as: ${hostname}"
-    tailscale status
+      --advertise-tags=tag:vcluster-worker
