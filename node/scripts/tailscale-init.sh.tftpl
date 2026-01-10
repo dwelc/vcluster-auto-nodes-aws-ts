@@ -1,17 +1,22 @@
   - |
     #!/bin/bash
     # Tailscale installation and setup
-    set -euo pipefail
 
-    # Log to both syslog and a dedicated file for easier debugging
-    exec 1> >(tee -a /var/log/tailscale-init.log | logger -s -t tailscale-init) 2>&1
+    # Log to a dedicated file for easier debugging
+    exec > /var/log/tailscale-init.log 2>&1
+    set -x  # Enable command tracing
 
-    echo "Starting Tailscale installation at $(date)"
+    echo "=== Tailscale installation starting at $(date) ==="
+    echo "PWD: $(pwd)"
+    echo "USER: $(whoami)"
+    echo "PATH: $PATH"
 
     # Install Tailscale using official script
     echo "Downloading and installing Tailscale..."
-    if ! curl -fsSL https://tailscale.com/install.sh | sh; then
-      echo "ERROR: Failed to install Tailscale"
+    if curl -fsSL https://tailscale.com/install.sh | sh; then
+      echo "Tailscale installed successfully"
+    else
+      echo "ERROR: Failed to install Tailscale (exit code: $?)"
       exit 1
     fi
 
