@@ -1,9 +1,6 @@
   - |
     set -eu
 
-    # Log all output to file for debugging
-    exec >> /var/log/tailscale-init.log 2>&1
-
     echo "=== Tailscale init starting at $(date) ==="
     echo "Hostname will be: ${hostname}"
 
