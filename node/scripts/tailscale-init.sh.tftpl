@@ -2,27 +2,45 @@
     #!/bin/bash
     set -euo pipefail
 
-    # Log to syslog
-    exec 1> >(logger -s -t tailscale-init) 2>&1
+    # Log to both syslog and file for debugging
+    exec 1> >(tee /var/log/tailscale-init.log | logger -s -t tailscale-init) 2>&1
+
+    echo "=== Tailscale init starting at $(date) ==="
+    echo "Hostname will be: ${hostname}"
 
     # Install Tailscale
+    echo "Installing Tailscale..."
     curl -fsSL https://tailscale.com/install.sh | sh
+    echo "Tailscale installed successfully"
 
     # Wait for tailscaled to be ready
+    echo "Waiting for tailscaled service..."
     for i in {1..30}; do
-      systemctl is-active --quiet tailscaled && break
+      if systemctl is-active --quiet tailscaled; then
+        echo "tailscaled is ready"
+        break
+      fi
       sleep 2
     done
 
     # Connect to Tailscale (try with tags first, fallback without tags if needed)
-    tailscale up \
+    echo "Connecting to Tailscale with tags..."
+    if tailscale up \
       --reset \
       --auth-key="${tailscale_auth_key}" \
       --accept-routes \
       --hostname="${hostname}" \
-      --advertise-tags=tag:vcluster-worker || \
-    tailscale up \
-      --reset \
-      --auth-key="${tailscale_auth_key}" \
-      --accept-routes \
-      --hostname="${hostname}"
+      --advertise-tags=tag:vcluster-worker; then
+      echo "Connected successfully with tags"
+    else
+      echo "Failed with tags, retrying without tags..."
+      tailscale up \
+        --reset \
+        --auth-key="${tailscale_auth_key}" \
+        --accept-routes \
+        --hostname="${hostname}"
+      echo "Connected successfully without tags"
+    fi
+
+    echo "=== Tailscale init completed at $(date) ==="
+    tailscale status
