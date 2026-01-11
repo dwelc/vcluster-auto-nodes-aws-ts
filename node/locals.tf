@@ -9,9 +9,9 @@ locals {
   cluster_tag           = nonsensitive(var.vcluster.nodeEnvironment.outputs.infrastructure["cluster_tag"])
 
   # Tailscale configuration
-  # Try nodeType properties first, then fall back to provider-level properties
-  tailscale_enabled  = try(tobool(var.vcluster.nodeType.spec.properties["tailscale-enabled"]), try(tobool(var.vcluster.properties["tailscale-enabled"]), false))
-  tailscale_auth_key = try(var.vcluster.nodeType.spec.properties["tailscale-auth-key"], try(var.vcluster.properties["tailscale-auth-key"], ""))
+  # var.vcluster.properties contains merged properties from NodeProvider CRD and VirtualClusterInstance
+  tailscale_enabled  = try(tobool(var.vcluster.properties["tailscale-enabled"]), false)
+  tailscale_auth_key = try(var.vcluster.properties["tailscale-auth-key"], "")
 
   # Generate Tailscale user data if enabled
   tailscale_user_data = local.tailscale_enabled && local.tailscale_auth_key != "" ? templatefile(
