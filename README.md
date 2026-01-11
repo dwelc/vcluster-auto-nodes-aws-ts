@@ -8,7 +8,7 @@ This Terraform-based node provider enables vCluster worker nodes running on AWS 
 
 ## Limitations
 
-[Issue #1 - Auth Handling](https://github.com/dwelc/vcluster-auto-nodes-aws-ts/issues/1)At the moment this does not handle AWS authentication. Create a Node Provider from the quickstart template to create the credentials, then edit the node provider templates to point to this repo. 
+[Issue #1 - Auth Handling](https://github.com/dwelc/vcluster-auto-nodes-aws-ts/issues/1) - At the moment this does not handle AWS authentication. Create a Node Provider from the quickstart template to create the credentials, then edit the node provider templates to point to this repo. 
 
 ## Tailscale Configuration
 
