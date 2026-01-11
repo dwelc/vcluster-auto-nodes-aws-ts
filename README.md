@@ -85,7 +85,7 @@ When Tailscale is enabled, worker nodes automatically:
 
 ### Example Configuration
 
-Complete example with Tailscale enabled:
+Complete VirtualClusterInstance CRD with Tailscale enabled:
 
 ```yaml
 controlPlane:
@@ -95,19 +95,21 @@ controlPlane:
 privateNodes:
   enabled: true
   autoNodes:
-  - provider: aws-ec2
-    properties:
-      tailscale-enabled: "true"
-      tailscale-auth-key: "tskey-auth-kXXXXXXXXXXX-XXXXXXXXXXXXXXXXXXXXXXXX"
-    dynamic:
-    - name: aws-cpu-nodes
-      nodeTypeSelector:
-      - property: instance-type
-        operator: In
-        values: ["t3.medium"]
-      limits:
-        cpu: "100"
-        memory: "200Gi"
+    - provider: dan-aws
+      properties:
+        tailscale-enabled: 'true'
+        tailscale-auth-key: tskey-auth-kXXXXXXXXXXX-XXXXXXXXXXXXXXXXXXXXXXXX
+      dynamic:
+        - name: aws-node-pool
+          nodeTypeSelector:
+            - property: instance-type
+              operator: In
+              values:
+                - t3.medium
+          limits:
+            cpu: '10'
+            memory: 150Gi
+            nvidia.com/gpu: '4'
 ```
 
 ## Additional Resources
