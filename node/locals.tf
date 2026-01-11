@@ -9,14 +9,9 @@ locals {
   cluster_tag           = nonsensitive(var.vcluster.nodeEnvironment.outputs.infrastructure["cluster_tag"])
 
   # Tailscale configuration
-  # NodeProvider CRD properties are defaults, VirtualClusterInstance should override them
-  # However, empty strings from NodeProvider currently override VirtualClusterInstance values
-  # Workaround: treat empty strings as "not configured"
-  tailscale_enabled_raw  = try(var.vcluster.properties["tailscale-enabled"], "")
-  tailscale_auth_key_raw = try(var.vcluster.properties["tailscale-auth-key"], "")
-
-  tailscale_enabled  = local.tailscale_enabled_raw != "" && local.tailscale_enabled_raw != "false" ? tobool(local.tailscale_enabled_raw) : false
-  tailscale_auth_key = local.tailscale_auth_key_raw
+  # var.vcluster.properties contains merged properties from NodeProvider and VirtualClusterInstance
+  tailscale_enabled  = try(tobool(var.vcluster.properties["tailscale-enabled"]), false)
+  tailscale_auth_key = try(var.vcluster.properties["tailscale-auth-key"], "")
 
   # Generate Tailscale user data if enabled
   tailscale_user_data = local.tailscale_enabled && local.tailscale_auth_key != "" ? templatefile(
