@@ -118,4 +118,4 @@ privateNodes:
 
 ## Additional Resources
 
-For complete setup instructions, authentication methods, and advanced configuration options, refer to the [original vCluster Auto Nodes AWS documentation](https://github.com/loft-sh/vcluster-auto-nodes-aws).
+For complete setup instructions, authentication methods, and advanced configuration options, refer to the [vCluster Node Provider Documentation](https://www.vcluster.com/docs/platform/administer/node-providers/overview).
