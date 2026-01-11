@@ -26,9 +26,9 @@ This Terraform-based node provider enables vCluster worker nodes running on AWS 
 
 Tailscale can be configured at two levels:
 
-#### Provider Level (All Nodes)
+#### Provider Level (All vClusters)
 
-Add Tailscale properties to your NodeProvider CRD to enable it for all nodes:
+Add Tailscale properties to your NodeProvider CRD to enable it for all vClusters by default:
 
 ```yaml
 spec:
@@ -38,24 +38,25 @@ spec:
 
 ```
 
-#### NodeType Level (Selective Nodes)
+#### vCluster Level (All Nodes)
 
-Configure Tailscale per nodeType for more granular control:
+Add Tailscale properties to providers inside a VirtualClusterInstance CRD:
 
 ```yaml
 privateNodes:
   enabled: true
   autoNodes:
-  - provider: aws-ec2
-    dynamic:
-    - name: aws-tailscale-nodes
+    - provider: dan-aws
       properties:
-        tailscale-enabled: "true"
-        tailscale-auth-key: "tskey-auth-xxxxx-xxxxxxxxxxxxxx"
-      nodeTypeSelector:
-      - property: instance-type
-        operator: In
-        values: ["t3.medium"]
+        tailscale-enabled: 'true'
+        tailscale-auth-key: '"tskey-auth-xxxxx-xxxxxxxxxxxxxx"'
+      dynamic:
+        - name: aws-node-pool
+          nodeTypeSelector:
+            - property: instance-type
+              operator: In
+              values:
+                - t3.medium
 ```
 
 ### Features
