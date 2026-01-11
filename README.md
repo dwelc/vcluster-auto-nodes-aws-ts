@@ -33,8 +33,9 @@ Add Tailscale properties to your NodeProvider CRD to enable it for all nodes:
 ```yaml
 spec:
   properties:
-    tailscale-auth-key: tskey-auth-xxxxxxxxxxxxxx-xxxxxxxxxxxxx
     tailscale-enabled: 'true'
+    tailscale-auth-key: "tskey-auth-xxxxx-xxxxxxxxxxxxxx"
+
 ```
 
 #### NodeType Level (Selective Nodes)
