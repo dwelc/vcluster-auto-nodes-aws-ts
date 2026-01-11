@@ -4,7 +4,7 @@ This is a fork of the [vCluster Auto Nodes AWS quickstart template](https://gith
 
 ## Overview
 
-This Terraform-based node provider enables vCluster worker nodes running on AWS EC2 to automatically join your Tailscale network during provisioning. This allows secure remote access to nodes and integration with your existing Tailscale infrastructure without requiring bastion hosts or VPN configurations.
+This Terraform-based node provider enables vCluster worker nodes running on AWS EC2 to automatically join your Tailscale network during provisioning. This allows secure remote access to nodes and integration with your existing Tailscale infrastructure without requiring bastion hosts or allowing ssh/public access from the EC2 instance.
 
 ## Limitations
 
