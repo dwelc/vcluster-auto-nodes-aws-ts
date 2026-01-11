@@ -70,7 +70,7 @@ When Tailscale is enabled, worker nodes automatically:
 - **Install Tailscale** during initial provisioning via cloud-init
 - **Connect to your tailnet** using the provided auth key
 - **Accept subnet routes** advertised by other nodes in your tailnet
-- **Use a consistent hostname** format: `<vcluster-name>-<subnet-index>`
+- **Use a consistent hostname** format: `<vcluster-name>-<index>`
 - **Attempt tag-based joining** (falls back to untagged if ACLs aren't configured)
 
 ### Security Best Practices
