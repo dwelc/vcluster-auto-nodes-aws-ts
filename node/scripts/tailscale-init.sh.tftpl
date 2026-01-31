@@ -38,32 +38,5 @@
       echo "Connected successfully without tags"
     fi
 
-    # Wait for Tailscale IP to be assigned
-    echo "Waiting for Tailscale IP..."
-    TAILSCALE_IP=""
-    for i in {1..30}; do
-      TAILSCALE_IP=$(tailscale ip -4 2>/dev/null)
-      if [[ -n "$TAILSCALE_IP" ]]; then
-        echo "Got Tailscale IP: $TAILSCALE_IP"
-        break
-      fi
-      sleep 2
-    done
-
-    if [[ -n "$TAILSCALE_IP" ]]; then
-      # Update vCluster node-ip configuration to use Tailscale IP
-      # This allows the API server to proxy to kubelet via Tailscale
-      echo "KUBELET_VCLUSTER_NODE_IP_ARGS=--node-ip=$TAILSCALE_IP" > /etc/vcluster/vcluster-node-ip-flags.env
-      echo "Configured kubelet to use Tailscale IP: $TAILSCALE_IP"
-
-      # Restart kubelet to pick up the new IP (if it's already running)
-      if systemctl is-active --quiet kubelet; then
-        echo "Restarting kubelet with new node-ip..."
-        systemctl restart kubelet
-      fi
-    else
-      echo "WARNING: Failed to get Tailscale IP after 60 seconds, using default node IP"
-    fi
-
     echo "=== Tailscale init completed at $(date) ==="
     tailscale status
