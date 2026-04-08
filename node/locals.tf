@@ -1,6 +1,6 @@
 locals {
-  vcluster_name      = nonsensitive(var.vcluster.instance.metadata.name)
-  vcluster_namespace = nonsensitive(var.vcluster.instance.metadata.namespace)
+  vcluster_name      = nonsensitive(var.vcluster.name)
+  vcluster_namespace = nonsensitive(var.vcluster.namespace)
 
   subnet_id             = nonsensitive(var.vcluster.nodeEnvironment.outputs.infrastructure["private_subnet_ids"][random_integer.subnet_index.result])
   instance_type         = nonsensitive(var.vcluster.nodeType.spec.properties["instance-type"])
