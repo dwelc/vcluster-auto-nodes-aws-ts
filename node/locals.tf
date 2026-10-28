@@ -22,13 +22,13 @@ locals {
     }
   ) : ""
 
-  # Combine Tailscale user data with vCluster join command
-  # Since vCluster generates cloud-config with runcmd, we need to merge properly
+  # Prepend Tailscale as a single-line runcmd item, matching the indent of vCluster's first item
+  # (vCluster 0.37 emits items at column 0; older versions indented them)
   user_data = local.tailscale_enabled && local.tailscale_auth_key != "" ? (
     var.vcluster.userData != "" ? replace(
       var.vcluster.userData,
-      "runcmd:",
-      "runcmd:\n${local.tailscale_user_data}"
+      "/runcmd:\\n([ \\t]*)- /",
+      "runcmd:\n$1- echo ${base64encode(local.tailscale_user_data)} | base64 -d | bash\n$1- "
     ) : var.vcluster.userData
   ) : (var.vcluster.userData != "" ? var.vcluster.userData : null)
 }
