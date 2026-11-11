@@ -4,7 +4,7 @@ data "aws_ami" "ami" {
 
   filter {
     name   = "name"
-    values = ["ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-*"]
+    values = ["ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-${local.ami_arch == "arm64" ? "arm64" : "amd64"}-server-*"]
   }
 
   filter {
@@ -19,8 +19,12 @@ data "aws_ami" "ami" {
 
   filter {
     name   = "architecture"
-    values = ["x86_64"]
+    values = [local.ami_arch]
   }
+}
+
+data "aws_ec2_instance_type" "this" {
+  instance_type = local.instance_type
 }
 
 module "validation" {

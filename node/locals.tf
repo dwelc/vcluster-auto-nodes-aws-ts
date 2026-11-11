@@ -8,6 +8,9 @@ locals {
   instance_profile_name = nonsensitive(var.vcluster.nodeEnvironment.outputs.infrastructure["instance_profile_name"])
   cluster_tag           = nonsensitive(var.vcluster.nodeEnvironment.outputs.infrastructure["cluster_tag"])
 
+  # Graviton (arm64-only) types get the arm64 AMI; anything x86-capable stays x86_64
+  ami_arch = contains(data.aws_ec2_instance_type.this.supported_architectures, "x86_64") ? "x86_64" : "arm64"
+
   # Tailscale configuration
   # var.vcluster.properties contains merged properties from NodeProvider and VirtualClusterInstance
   tailscale_enabled  = try(tobool(var.vcluster.properties["tailscale-enabled"]), false)
